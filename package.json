@@ -1,0 +1,29 @@
+{
+  "name": "videoshots",
+  "version": "1.0.0",
+  "description": "A lightweight YouTube video library with lazy loading support",
+  "main": "dist/videoshots.min.js",
+  "style": "dist/videoshots.min.css",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "keywords": [
+    "youtube",
+    "video",
+    "shorts",
+    "lazy-loading",
+    "iframe",
+    "youtube-api"
+  ],
+  "author": "Lucas Tiago",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lucastiago/videoshots"
+  },
+  "files": [
+    "dist/",
+    "videoshots.js",
+    "videoshots.css"
+  ]
+}
