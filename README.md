@@ -20,8 +20,8 @@ npm install videoshots
 
 ### CDN
 ```html
-<link rel="stylesheet" href="https://unpkg.com/videoshots/dist/videoshots.min.css">
-<script src="https://unpkg.com/videoshots/dist/videoshots.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.0.0/dist/videoshots.min.css">
+<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.0.0/dist/videoshots.min.js"></script>
 ```
 
 ### Manual
@@ -340,6 +340,9 @@ MIT License - see [LICENSE](LICENSE) file.
 ## Author
 
 **Lucas Tiago**
+
+- GitHub: [@eulucastiagolt](https://github.com/eulucastiagolt)
+- Repository: [videoshorts](https://github.com/eulucastiagolt/videoshorts)
 
 ## Contributing
 

@@ -26,7 +26,7 @@
  * @author Lucas Tiago
  * @version 1.0.0
  * @license MIT
- * @repository https://github.com/lucastiago/videoshots
+ * @repository https://github.com/eulucastiagolt/videoshorts
  */
 
 (function(global) {
