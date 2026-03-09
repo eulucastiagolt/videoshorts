@@ -24,7 +24,7 @@
  * SOFTWARE.
  * 
  * @author Lucas Tiago
- * @version 1.4.0
+ * @version 1.5.0
  * @license MIT
  * @repository https://github.com/eulucastiagolt/videoshorts
  */
@@ -32,12 +32,19 @@
 (function(global) {
   'use strict';
 
-const VERSION = '1.4.0';
+const VERSION = '1.5.0';
   const DEFAULT_OPTIONS = {
     containerClass: 'videoshort-container',
     wrapperClass: 'videoshort-wrapper',
     itemClass: 'videoshort-item',
     skeletonClass: 'videoshort-skeleton',
+    overlayClass: 'videoshort-overlay',
+    playButtonClass: 'videoshort-play-button',
+    playButtonIcon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+    pauseButtonIcon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>',
+    muteButtonClass: 'videoshort-mute-button',
+    muteButtonIcon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>',
+    unmuteButtonIcon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>',
     lazy: true,
     lazyThreshold: 0.1,
     lazyRootMargin: '200px',
@@ -55,6 +62,7 @@ const VERSION = '1.4.0';
     onReady: null,
     onStateChange: null,
     onEnd: null,
+    onPlay: null,
     onError: null
   };
 
@@ -105,6 +113,9 @@ const VERSION = '1.4.0';
       this.players = [];
       this.playerStates = [];
       this.playerElements = [];
+      this.overlayElements = [];
+      this.playButtons = [];
+      this.muteButtons = [];
       this.observer = null;
       this.loadedVideos = new Set();
       this._wrapperEl = null;
@@ -176,6 +187,9 @@ const VERSION = '1.4.0';
           itemEl.appendChild(playerEl);
         }
 
+        const overlay = this._createOverlay(index);
+        itemEl.appendChild(overlay);
+
         this.playerElements[index] = itemEl;
         this._wrapperEl.insertAdjacentElement(this.options.insertPositionItem, itemEl);
       });
@@ -198,6 +212,91 @@ const VERSION = '1.4.0';
       skeleton.className = this.options.skeletonClass;
       skeleton.setAttribute('data-video-index', index);
       return skeleton;
+    }
+
+    _createOverlay(index) {
+      const overlay = document.createElement('div');
+      overlay.className = this.options.overlayClass;
+
+      const playButton = document.createElement('button');
+      playButton.className = this.options.playButtonClass;
+      playButton.setAttribute('type', 'button');
+      playButton.setAttribute('aria-label', 'Play');
+      playButton.innerHTML = this.options.playButtonIcon;
+
+      const muteButton = document.createElement('button');
+      muteButton.className = this.options.muteButtonClass;
+      muteButton.setAttribute('type', 'button');
+      muteButton.setAttribute('aria-label', 'Toggle mute');
+      muteButton.innerHTML = this.options.muted ? this.options.muteButtonIcon : this.options.unmuteButtonIcon;
+
+      overlay.appendChild(playButton);
+      overlay.appendChild(muteButton);
+
+      this.overlayElements[index] = overlay;
+      this.playButtons[index] = playButton;
+      this.muteButtons[index] = muteButton;
+
+      this._setupOverlayEvents(index, playButton, muteButton);
+
+      return overlay;
+    }
+
+    _setupOverlayEvents(index, playButton, muteButton) {
+      const handlePlayClick = (e) => {
+        e.stopPropagation();
+        if (!this.players[index]) {
+          if (!this.loadedVideos.has(index)) {
+            this._loadVideo(index).then(() => {
+              setTimeout(() => this._togglePlayPause(index), 100);
+            });
+          }
+          return;
+        }
+        this._togglePlayPause(index);
+      };
+
+      const handleMuteClick = (e) => {
+        e.stopPropagation();
+        this.toggleMute(index);
+        this._updateMuteButton(index);
+      };
+
+      playButton.addEventListener('click', handlePlayClick);
+      muteButton.addEventListener('click', handleMuteClick);
+    }
+
+    _togglePlayPause(index) {
+      if (!this.players[index]) return;
+      
+      const state = this.playerStates[index];
+      if (state && state.playing) {
+        this.pause(index);
+      } else {
+        this.play(index);
+      }
+    }
+
+    _updatePlayButton(index) {
+      const playButton = this.playButtons[index];
+      if (!playButton) return;
+
+      const state = this.playerStates[index];
+      const isPlaying = state && state.playing;
+      
+      playButton.innerHTML = isPlaying ? this.options.pauseButtonIcon : this.options.playButtonIcon;
+      playButton.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play');
+    }
+
+    _updateMuteButton(index) {
+      const muteButton = this.muteButtons[index];
+      if (!muteButton) return;
+
+      const state = this.playerStates[index];
+      const isMuted = state ? state.muted : this.options.muted;
+      
+      muteButton.innerHTML = isMuted ? this.options.muteButtonIcon : this.options.unmuteButtonIcon;
+      muteButton.setAttribute('aria-label', isMuted ? 'Unmute' : 'Mute');
     }
 
     _setupLazyLoading() {
@@ -295,6 +394,9 @@ const VERSION = '1.4.0';
                 playing: false
               };
               
+              this._updatePlayButton(index);
+              this._updateMuteButton(index);
+              
               if (this.options.onReady) {
                 this.options.onReady(event, index, this);
               }
@@ -302,10 +404,17 @@ const VERSION = '1.4.0';
             },
             onStateChange: (event) => {
               this.playerStates[index] = this.playerStates[index] || {};
+              const wasPlaying = this.playerStates[index].playing;
               this.playerStates[index].playing = event.data === YT.PlayerState.PLAYING;
+              
+              this._updatePlayButton(index);
               
               if (this.options.onStateChange) {
                 this.options.onStateChange(event, index, this);
+              }
+              
+              if (event.data === YT.PlayerState.PLAYING && this.options.onPlay) {
+                this.options.onPlay(event, index, this);
               }
               
               if (event.data === YT.PlayerState.ENDED && this.options.onEnd) {
@@ -386,11 +495,13 @@ const VERSION = '1.4.0';
       if (index !== undefined && this.players[index]) {
         this.players[index].mute();
         if (this.playerStates[index]) this.playerStates[index].muted = true;
+        this._updateMuteButton(index);
       } else {
         this.players.forEach((player, i) => {
           if (player) {
             player.mute();
             if (this.playerStates[i]) this.playerStates[i].muted = true;
+            this._updateMuteButton(i);
           }
         });
       }
@@ -401,11 +512,13 @@ const VERSION = '1.4.0';
       if (index !== undefined && this.players[index]) {
         this.players[index].unMute();
         if (this.playerStates[index]) this.playerStates[index].muted = false;
+        this._updateMuteButton(index);
       } else {
         this.players.forEach((player, i) => {
           if (player) {
             player.unMute();
             if (this.playerStates[i]) this.playerStates[i].muted = false;
+            this._updateMuteButton(i);
           }
         });
       }
@@ -497,6 +610,9 @@ getPlayers() {
       this.players = [];
       this.playerStates = [];
       this.playerElements = [];
+      this.overlayElements = [];
+      this.playButtons = [];
+      this.muteButtons = [];
       this.loadedVideos.clear();
       this._clearContainer();
       return this;

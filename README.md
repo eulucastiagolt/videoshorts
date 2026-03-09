@@ -21,8 +21,8 @@ npm install videoshots
 
 ### CDN
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.3.0/dist/videoshots.min.css">
-<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.3.0/dist/videoshots.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.5.0/dist/videoshots.min.css">
+<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.5.0/dist/videoshots.min.js"></script>
 ```
 
 ### Manual
@@ -64,6 +64,15 @@ const player = new VideoShorts(container, videos, {
   wrapperClass: 'videoshort-wrapper',
   itemClass: 'videoshort-item',
   skeletonClass: 'videoshort-skeleton',
+  overlayClass: 'videoshort-overlay',
+  playButtonClass: 'videoshort-play-button',
+  muteButtonClass: 'videoshort-mute-button',
+
+  // Button Icons
+  playButtonIcon: '▶',
+  pauseButtonIcon: '⏸',
+  muteButtonIcon: '🔇',
+  unmuteButtonIcon: '🔊',
 
   // Lazy Loading
   lazy: true,
@@ -90,6 +99,8 @@ const player = new VideoShorts(container, videos, {
   // Events
   onReady: (event, index, instance) => {},
   onStateChange: (event, index, instance) => {},
+  onEnd: (event, index, instance) => {},
+  onPlay: (event, index, instance) => {},
   onError: (event, index, instance) => {}
 });
 ```
@@ -102,6 +113,13 @@ const player = new VideoShorts(container, videos, {
 | `wrapperClass` | `string` | `'videoshort-wrapper'` | CSS class for the wrapper element |
 | `itemClass` | `string` | `'videoshort-item'` | CSS class for each video item |
 | `skeletonClass` | `string` | `'videoshort-skeleton'` | CSS class for skeleton loader |
+| `overlayClass` | `string` | `'videoshort-overlay'` | CSS class for the overlay element |
+| `playButtonClass` | `string` | `'videoshort-play-button'` | CSS class for the play/pause button |
+| `muteButtonClass` | `string` | `'videoshort-mute-button'` | CSS class for the mute/unmute button |
+| `playButtonIcon` | `string` | `'<svg>...</svg>'` | SVG icon for play button |
+| `pauseButtonIcon` | `string` | `'<svg>...</svg>'` | SVG icon for pause button |
+| `muteButtonIcon` | `string` | `'<svg>...</svg>'` | SVG icon for muted state |
+| `unmuteButtonIcon` | `string` | `'<svg>...</svg>'` | SVG icon for unmuted state |
 | `lazy` | `boolean` | `true` | Enable lazy loading |
 | `lazyThreshold` | `number` | `0.1` | Intersection threshold (0-1) |
 | `lazyRootMargin` | `string` | `'200px'` | Load videos before they enter viewport |
@@ -244,6 +262,10 @@ const player = new VideoShorts('#container', videos, {
     //  3: buffering
     //  5: video cued
     console.log(`Video ${index} state:`, event.data);
+  },
+
+  onPlay: (event, index, instance) => {
+    console.log(`Video ${index} started playing`);
   },
 
   onEnd: (event, index, instance) => {
