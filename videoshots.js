@@ -271,6 +271,7 @@ this.observer = null;
       
       const thumbnail = document.createElement('div');
       thumbnail.className = this.options.thumbnailClass;
+      thumbnail.classList.add('videoshort-thumbnail-hidden');
       thumbnail.setAttribute('data-thumbnail-index', index);
       thumbnail.style.setProperty('--videoshort-thumbnail-transition', this.options.thumbnailTransitionDuration);
       
