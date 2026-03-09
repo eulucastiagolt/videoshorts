@@ -422,12 +422,23 @@ _showThumbnail(index) {
       });
     }
 
-    _togglePlayPause(index) {
+_togglePlayPause(index) {
       if (!this.players[index]) return;
-      if (typeof this.players[index].playVideo !== 'function') return;
       
-      const state = this.playerStates[index];
-      if (state && state.playing) {
+      const player = this.players[index];
+      
+      // Verificar estado real do player do YouTube diretamente
+      let actualState = null;
+      try {
+        actualState = player.getPlayerState();
+      } catch (e) {
+        // Se não conseguir obter o estado, usar o cacheado
+      }
+      
+      // YT.PlayerState.PLAYING = 1
+      const isActuallyPlaying = actualState === 1;
+      
+      if (isActuallyPlaying) {
         this.pause(index);
       } else {
         this.play(index);
@@ -592,7 +603,7 @@ _showThumbnail(index) {
               }
               resolve();
             },
-            onStateChange: (event) => {
+onStateChange: (event) => {
               this.playerStates[index] = this.playerStates[index] || {};
               const wasPlaying = this.playerStates[index].playing;
               this.playerStates[index].playing = event.data === YT.PlayerState.PLAYING;
