@@ -32,7 +32,7 @@
 (function(global) {
   'use strict';
 
-const VERSION = '1.6.2';
+const VERSION = '1.6.3';
   const DEFAULT_OPTIONS = {
     containerClass: 'videoshort-container',
     wrapperClass: 'videoshort-wrapper',
@@ -448,16 +448,26 @@ _togglePlayPause(index) {
     _updatePlayButton(index) {
       if (!this._wrapperEl) return;
       
-      const state = this.playerStates[index];
-      const isPlaying = state && state.playing;
+      // Usar estado real do player do YouTube
+      let isActuallyPlaying = false;
+      if (this.players[index]) {
+        try {
+          const actualState = this.players[index].getPlayerState();
+          isActuallyPlaying = actualState === 1; // YT.PlayerState.PLAYING
+        } catch (e) {
+          // Fallback para estado cacheado
+          const state = this.playerStates[index];
+          isActuallyPlaying = state && state.playing;
+        }
+      }
       
       const buttons = this._wrapperEl.querySelectorAll(
         `[data-instance-id="${this._instanceId}"][data-video-index="${index}"] .${this.options.playButtonClass}`
       );
       
       buttons.forEach(btn => {
-        btn.innerHTML = isPlaying ? this.options.pauseButtonIcon : this.options.playButtonIcon;
-        btn.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play');
+        btn.innerHTML = isActuallyPlaying ? this.options.pauseButtonIcon : this.options.playButtonIcon;
+        btn.setAttribute('aria-label', isActuallyPlaying ? 'Pause' : 'Play');
       });
     }
 

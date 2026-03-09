@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VideoShorts Example - v1.6.2</title>
+  <title>VideoShorts Example - v1.6.3</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
   <link rel="stylesheet" href="videoshots.css">
   <style>
     body {
@@ -12,18 +13,18 @@
       padding: 20px;
       background: #f5f5f5;
     }
-    
+
     h2 {
       margin-top: 40px;
     }
-    
+
     #controls {
       margin-top: 20px;
       padding: 16px;
       background: #fff;
       border-radius: 8px;
     }
-    
+
     #controls button {
       margin: 4px;
       padding: 8px 16px;
@@ -33,15 +34,28 @@
       color: #fff;
       cursor: pointer;
     }
-    
+
     #controls button:hover {
       background: #555;
     }
-    
+
     #controls hr {
       margin: 12px 0;
       border: none;
       border-top: 1px solid #ddd;
+    }
+
+    .swiper{
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .swiper .videoshort-wrapper{
+      /* display: initial; */
+      flex-wrap: inherit;
+      gap: inherit;
+      justify-content: initial;
+      padding: inherit;
     }
   </style>
 </head>
@@ -52,7 +66,23 @@
   <h2> Videos (16/9)</h2>
   <div id="video-container-normal" data-videoshort></div>
 
-<div id="controls">
+  <h2>Swiperjs</h2>
+  <div id="videoshorts" class="videoshort-container">
+    <div class="swiper-pagination"></div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+  </div>
+  <div id="controls">
+    <strong>Shorts Controls:</strong><br>
+    <button onclick="shortsSwiper.play()">Play All</button>
+    <button onclick="shortsSwiper.pause()">Pause All</button>
+    <button onclick="shortsSwiper.stop()">Stop All</button>
+    <button onclick="shortsSwiper.mute()">Mute All</button>
+    <button onclick="shortsSwiper.unMute()">Unmute All</button>
+    <button onclick="shortsSwiper.setVolume(50)">Volume 50%</button>
+  </div>
+
+  <div id="controls">
     <strong>Shorts Controls:</strong><br>
     <button onclick="shorts.play()">Play All</button>
     <button onclick="shorts.pause()">Pause All</button>
@@ -68,6 +98,7 @@
     <button onclick="normal.unMute()">Unmute All</button>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
   <script src="videoshots.js"></script>
   <script>
     const shortsVideos = [
@@ -143,6 +174,48 @@
     }
 
     init();
+
+    const swiperShortsVideos = [
+      'https://www.youtube.com/shorts/ZDqo7XROuwM',
+      'https://www.youtube.com/shorts/dQw4w9WgXcQ',
+      'https://www.youtube.com/watch?v=SGfb6y1j5x0',
+      'https://www.youtube.com/watch?v=L5sr0kgwjEQ',
+      'https://www.youtube.com/watch?v=1swTK9FaCvY'
+    ];
+
+    let swiperShots;
+    swiperShots = new VideoShorts('#videoshorts', swiperShortsVideos, {
+      containerClass: 'swiper',
+      wrapperClass: 'videoshort-wrapper swiper-wrapper',
+      itemClass: 'videoshort-item swiper-slide',
+      skeletonClass: 'videoshort-skeleton',
+      insertPositionContainer: "afterbegin",
+      lazy: true,
+      width: '280px',
+      aspectRatio: '9/16',
+      muted: true,
+      loop: true,
+      controls: 0,
+      onReady: (event, index, instance) => {
+        console.log(`Short ${index} ready`);
+      }
+      // onEnd
+    })
+    
+    swiperShots.init().then(()=>{
+      console.log('All videos initialized');
+      const swiper = new Swiper('.swiper', {
+        speed: 400,
+        spaceBetween: 16,
+        slidesPerView: 3,
+        loop: true,
+        centeredSlides: true,
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+      });
+    });
   </script>
 </body>
 </html>
