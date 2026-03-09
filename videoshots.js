@@ -24,7 +24,7 @@
  * SOFTWARE.
  * 
  * @author Lucas Tiago
- * @version 1.2.1
+ * @version 1.3.0
  * @license MIT
  * @repository https://github.com/eulucastiagolt/videoshorts
  */
@@ -32,7 +32,7 @@
 (function(global) {
   'use strict';
 
-  const VERSION = '1.2.1';
+  const VERSION = '1.3.0';
   const DEFAULT_OPTIONS = {
     containerClass: 'videoshort-container',
     wrapperClass: 'videoshort-wrapper',
@@ -50,7 +50,6 @@
     controls: 1,
     rel: 0,
     modestbranding: 1,
-    insertPositionContainer: 'beforeend',
     insertPositionWrapper: 'beforeend',
     insertPositionItem: 'beforeend'
   };
@@ -104,7 +103,6 @@
       this.playerElements = [];
       this.observer = null;
       this.loadedVideos = new Set();
-      this._containerEl = null;
       this._wrapperEl = null;
     }
 
@@ -147,8 +145,9 @@
     _render() {
       this._clearContainer();
       
-      this._containerEl = document.createElement('div');
-      this._containerEl.className = this.options.containerClass;
+      if (this.options.containerClass) {
+        this.container.classList.add(this.options.containerClass);
+      }
 
       this._wrapperEl = document.createElement('div');
       this._wrapperEl.className = this.options.wrapperClass;
@@ -177,15 +176,16 @@
         this._wrapperEl.insertAdjacentElement(this.options.insertPositionItem, itemEl);
       });
 
-      this._containerEl.insertAdjacentElement(this.options.insertPositionWrapper, this._wrapperEl);
-      this.container.insertAdjacentElement(this.options.insertPositionContainer, this._containerEl);
+      this.container.insertAdjacentElement(this.options.insertPositionWrapper, this._wrapperEl);
     }
 
     _clearContainer() {
-      if (this._containerEl && this._containerEl.parentNode) {
-        this._containerEl.parentNode.removeChild(this._containerEl);
+      if (this._wrapperEl && this._wrapperEl.parentNode) {
+        this._wrapperEl.parentNode.removeChild(this._wrapperEl);
       }
-      this._containerEl = null;
+      if (this.options.containerClass) {
+        this.container.classList.remove(this.options.containerClass);
+      }
       this._wrapperEl = null;
     }
 

@@ -21,8 +21,8 @@ npm install videoshots
 
 ### CDN
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.2.0/dist/videoshots.min.css">
-<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.2.0/dist/videoshots.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.3.0/dist/videoshots.min.css">
+<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.3.0/dist/videoshots.min.js"></script>
 ```
 
 ### Manual
@@ -84,7 +84,6 @@ const player = new VideoShorts(container, videos, {
   modestbranding: 1,
 
   // Insert Position (for compatibility with sliders/carousels)
-  insertPositionContainer: 'beforeend',
   insertPositionWrapper: 'beforeend',
   insertPositionItem: 'beforeend',
 
@@ -99,7 +98,7 @@ const player = new VideoShorts(container, videos, {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `containerClass` | `string` | `'videoshort-container'` | CSS class for the container element |
+| `containerClass` | `string` | `'videoshort-container'` | CSS class added to the container element |
 | `wrapperClass` | `string` | `'videoshort-wrapper'` | CSS class for the wrapper element |
 | `itemClass` | `string` | `'videoshort-item'` | CSS class for each video item |
 | `skeletonClass` | `string` | `'videoshort-skeleton'` | CSS class for skeleton loader |
@@ -115,9 +114,8 @@ const player = new VideoShorts(container, videos, {
 | `controls` | `number` | `1` | Show player controls |
 | `rel` | `number` | `0` | Show related videos |
 | `modestbranding` | `number` | `1` | Hide YouTube logo |
-| `insertPositionContainer` | `string` | `'beforeend'` | Position to insert container element |
-| `insertPositionWrapper` | `string` | `'beforeend'` | Position to insert wrapper element |
-| `insertPositionItem` | `string` | `'beforeend'` | Position to insert video items |
+| `insertPositionWrapper` | `string` | `'beforeend'` | Position to insert wrapper element in container |
+| `insertPositionItem` | `string` | `'beforeend'` | Position to insert video items in wrapper |
 
 ## Methods
 
@@ -357,7 +355,6 @@ VideoShorts is designed to work seamlessly with slider/carousel libraries like S
 
     // Initialize VideoShorts with insert positions
     const player = new VideoShorts('#video-container', videos, {
-      insertPositionContainer: 'afterbegin',
       insertPositionWrapper: 'beforeend',
       insertPositionItem: 'beforeend'
     });
