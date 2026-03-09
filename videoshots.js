@@ -466,7 +466,7 @@ onReady: null,
       return this.loadedVideos.has(index);
     }
 
-    cueVideo(index, seconds = 0) {
+    cueVideo(index, seconds = 0, muted = true) {
       if (index === undefined) return this;
       
       this._cueVideoState[index] = true;
@@ -479,6 +479,23 @@ onReady: null,
         if (!videoId) return;
         
         const player = this.players[index];
+        
+        if (muted) {
+          if (typeof player.mute === 'function') {
+            player.mute();
+          }
+          if (this.playerStates[index]) {
+            this.playerStates[index].muted = true;
+          }
+        } else {
+          if (typeof player.unMute === 'function') {
+            player.unMute();
+          }
+          if (this.playerStates[index]) {
+            this.playerStates[index].muted = false;
+          }
+        }
+        this._updateMuteButton(index);
         
         const onStateChange = (event) => {
           if (event.data === YT.PlayerState.PLAYING && this._cueVideoState[index]) {
