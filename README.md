@@ -120,7 +120,6 @@ const player = new VideoShorts(container, videos, {
 | `pauseButtonIcon` | `string` | `'<svg>...</svg>'` | SVG icon for pause button |
 | `muteButtonIcon` | `string` | `'<svg>...</svg>'` | SVG icon for muted state |
 | `unmuteButtonIcon` | `string` | `'<svg>...</svg>'` | SVG icon for unmuted state |
-| `cueVideoDelay` | `number` | `100` | Delay in ms to pause after cueVideo loads |
 | `lazy` | `boolean` | `true` | Enable lazy loading |
 | `lazyThreshold` | `number` | `0.1` | Intersection threshold (0-1) |
 | `lazyRootMargin` | `string` | `'200px'` | Load videos before they enter viewport |

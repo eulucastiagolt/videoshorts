@@ -59,12 +59,11 @@ const VERSION = '1.5.0';
     modestbranding: 1,
     insertPositionWrapper: 'beforeend',
     insertPositionItem: 'beforeend',
-    onReady: null,
+onReady: null,
     onStateChange: null,
     onEnd: null,
     onPlay: null,
-    onError: null,
-    cueVideoDelay: 100
+    onError: null
   };
 
   let ytApiReady = false;
@@ -467,10 +466,9 @@ const VERSION = '1.5.0';
       return this.loadedVideos.has(index);
     }
 
-    cueVideo(index, seconds = 0, delay) {
+    cueVideo(index, seconds = 0) {
       if (index === undefined) return this;
       
-      const pauseDelay = delay !== undefined ? delay : this.options.cueVideoDelay;
       this._cueVideoState[index] = true;
       
       const cueAtTime = () => {
@@ -484,16 +482,18 @@ const VERSION = '1.5.0';
         
         const onStateChange = (event) => {
           if (event.data === YT.PlayerState.PLAYING && this._cueVideoState[index]) {
-            setTimeout(() => {
-              if (this._cueVideoState[index] && this.players[index] && typeof this.players[index].pauseVideo === 'function') {
-                this.players[index].pauseVideo();
-                this._cueVideoState[index] = false;
-              }
-              if (this.playerStates[index]) {
-                this.playerStates[index].playing = false;
-              }
-              this._updatePlayButton(index);
-            }, pauseDelay);
+            this._cueVideoState[index] = false;
+            if (this.players[index] && typeof this.players[index].seekTo === 'function') {
+              this.players[index].seekTo(seconds, true);
+            }
+            if (this.players[index] && typeof this.players[index].pauseVideo === 'function') {
+              this.players[index].pauseVideo();
+            }
+            if (this.playerStates[index]) {
+              this.playerStates[index].playing = false;
+            }
+            this._updatePlayButton(index);
+            player.removeEventListener('onStateChange', onStateChange);
           }
         };
         

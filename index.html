@@ -67,7 +67,7 @@
     <button onclick="normal.pause()">Pause All</button>
     <button onclick="normal.mute()">Mute All</button>
     <button onclick="normal.unMute()">Unmute All</button>
-    <button onclick="normal.cueVideo(0, 10)">Cue Video 0 at 10s</button>
+    <button onclick="normal.cueVideo(0, 0, 0)">Cue Video 0 at 10s</button>
   </div>
 
   <script src="videoshots.js"></script>
@@ -128,7 +128,7 @@
         muted: true,
         loop: true,
         controls: 1,
-        cueVideoDelay: 110,
+        cueVideoDelay: 0,
         onReady: (event, index, instance) => {
           console.log(`Video ${index} ready`);
         },
