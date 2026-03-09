@@ -63,7 +63,8 @@ const VERSION = '1.5.0';
     onStateChange: null,
     onEnd: null,
     onPlay: null,
-    onError: null
+    onError: null,
+    cueVideoDelay: 100
   };
 
   let ytApiReady = false;
@@ -465,8 +466,10 @@ const VERSION = '1.5.0';
       return this.loadedVideos.has(index);
     }
 
-    cueVideo(index, seconds = 0) {
+    cueVideo(index, seconds = 0, delay) {
       if (index === undefined) return this;
+      
+      const pauseDelay = delay !== undefined ? delay : this.options.cueVideoDelay;
       
       const cueAtTime = () => {
         if (!this.players[index]) return;
@@ -488,7 +491,7 @@ const VERSION = '1.5.0';
             this.playerStates[index].playing = false;
           }
           this._updatePlayButton(index);
-        }, 100);
+        }, pauseDelay);
       };
 
       if (!this.loadedVideos.has(index)) {
