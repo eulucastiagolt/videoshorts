@@ -32,7 +32,7 @@
 (function(global) {
   'use strict';
 
-const VERSION = '1.6.1';
+const VERSION = '1.6.2';
   const DEFAULT_OPTIONS = {
     containerClass: 'videoshort-container',
     wrapperClass: 'videoshort-wrapper',
