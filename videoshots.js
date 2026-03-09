@@ -462,6 +462,36 @@ const VERSION = '1.5.0';
       return this.loadedVideos.has(index);
     }
 
+    cueVideo(index, seconds = 0) {
+      if (index === undefined) return this;
+      
+      const cueAtTime = () => {
+        if (!this.players[index]) return;
+        const videoId = extractVideoId(this.videos[index]);
+        if (!videoId) return;
+        
+        this.players[index].cueVideoById({
+          videoId: videoId,
+          startSeconds: seconds
+        });
+        
+        if (this.playerStates[index]) {
+          this.playerStates[index].playing = false;
+        }
+        this._updatePlayButton(index);
+      };
+
+      if (!this.loadedVideos.has(index)) {
+        this._loadVideo(index).then(() => {
+          setTimeout(cueAtTime, 100);
+        });
+      } else {
+        cueAtTime();
+      }
+      
+      return this;
+    }
+
     setSize(options) {
       if (options.width) this.options.width = options.width;
       if (options.height) this.options.height = options.height;
