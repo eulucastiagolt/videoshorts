@@ -268,6 +268,7 @@ const VERSION = '1.5.0';
 
     _togglePlayPause(index) {
       if (!this.players[index]) return;
+      if (typeof this.players[index].playVideo !== 'function') return;
       
       const state = this.playerStates[index];
       if (state && state.playing) {
@@ -491,14 +492,16 @@ const VERSION = '1.5.0';
       return this;
     }
 
-    mute(index) {
+mute(index) {
       if (index !== undefined && this.players[index]) {
-        this.players[index].mute();
-        if (this.playerStates[index]) this.playerStates[index].muted = true;
-        this._updateMuteButton(index);
+        if (typeof this.players[index].mute === 'function') {
+          this.players[index].mute();
+          if (this.playerStates[index]) this.playerStates[index].muted = true;
+          this._updateMuteButton(index);
+        }
       } else {
         this.players.forEach((player, i) => {
-          if (player) {
+          if (player && typeof player.mute === 'function') {
             player.mute();
             if (this.playerStates[i]) this.playerStates[i].muted = true;
             this._updateMuteButton(i);
@@ -510,12 +513,14 @@ const VERSION = '1.5.0';
 
     unMute(index) {
       if (index !== undefined && this.players[index]) {
-        this.players[index].unMute();
-        if (this.playerStates[index]) this.playerStates[index].muted = false;
-        this._updateMuteButton(index);
+        if (typeof this.players[index].unMute === 'function') {
+          this.players[index].unMute();
+          if (this.playerStates[index]) this.playerStates[index].muted = false;
+          this._updateMuteButton(index);
+        }
       } else {
         this.players.forEach((player, i) => {
-          if (player) {
+          if (player && typeof player.unMute === 'function') {
             player.unMute();
             if (this.playerStates[i]) this.playerStates[i].muted = false;
             this._updateMuteButton(i);
