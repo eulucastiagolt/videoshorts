@@ -10,6 +10,7 @@ A lightweight YouTube video library with lazy loading support. Transform YouTube
 - 💀 **Skeleton Loading** - Smooth loading experience
 - ⚡ **Lightweight** - No dependencies
 - 🎨 **Customizable** - CSS classes fully customizable
+- 🔌 **Library Friendly** - Compatible with SwiperJS, Slick, and other carousel/slider libraries
 
 ## Installation
 
@@ -20,8 +21,8 @@ npm install videoshots
 
 ### CDN
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.0.0/dist/videoshots.min.css">
-<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.0.0/dist/videoshots.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.2.0/dist/videoshots.min.css">
+<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.2.0/dist/videoshots.min.js"></script>
 ```
 
 ### Manual
@@ -82,6 +83,11 @@ const player = new VideoShorts(container, videos, {
   rel: 0,
   modestbranding: 1,
 
+  // Insert Position (for compatibility with sliders/carousels)
+  insertPositionContainer: 'beforeend',
+  insertPositionWrapper: 'beforeend',
+  insertPositionItem: 'beforeend',
+
   // Events
   onReady: (event, index, instance) => {},
   onStateChange: (event, index, instance) => {},
@@ -109,6 +115,9 @@ const player = new VideoShorts(container, videos, {
 | `controls` | `number` | `1` | Show player controls |
 | `rel` | `number` | `0` | Show related videos |
 | `modestbranding` | `number` | `1` | Hide YouTube logo |
+| `insertPositionContainer` | `string` | `'beforeend'` | Position to insert container element |
+| `insertPositionWrapper` | `string` | `'beforeend'` | Position to insert wrapper element |
+| `insertPositionItem` | `string` | `'beforeend'` | Position to insert video items |
 
 ## Methods
 
@@ -313,6 +322,77 @@ new VideoShorts('#fixed', fixedVideos, {
   height: '400px'
 });
 ```
+
+## Integration with Other Libraries
+
+VideoShorts is designed to work seamlessly with slider/carousel libraries like SwiperJS, Slick, and others.
+
+### SwiperJS Example
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Swiper CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <!-- VideoShorts CSS -->
+  <link rel="stylesheet" href="videoshots.min.css">
+</head>
+<body>
+  <div class="swiper">
+    <div class="swiper-wrapper" id="video-container"></div>
+    <div class="swiper-pagination"></div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="videoshots.min.js"></script>
+  <script>
+    const videos = [
+      'https://www.youtube.com/shorts/ZDqo7XROuwM',
+      'https://www.youtube.com/watch?v=SGfb6y1j5x0',
+      'https://www.youtube.com/shorts/abc123'
+    ];
+
+    // Initialize VideoShorts with insert positions
+    const player = new VideoShorts('#video-container', videos, {
+      insertPositionContainer: 'afterbegin',
+      insertPositionWrapper: 'beforeend',
+      insertPositionItem: 'beforeend'
+    });
+
+    player.init().then(() => {
+      // Initialize Swiper after videos are rendered
+      const swiper = new Swiper('.swiper', {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        pagination: {
+          el: '.swiper-pagination',
+        },
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+```
+
+### Insert Position Options
+
+The `insertPosition` options control where elements are inserted in the DOM. Possible values:
+
+| Value | Description |
+|-------|-------------|
+| `'beforebegin'` | Before the element itself |
+| `'afterbegin'` | Just inside the element, before its first child |
+| `'beforeend'` | Just inside the element, after its last child |
+| `'afterend'` | After the element itself |
+
+Use these options to control the exact placement of video elements within your slider/carousel structure.
 
 ## Build
 
