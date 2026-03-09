@@ -101,6 +101,8 @@
       this.playerElements = [];
       this.observer = null;
       this.loadedVideos = new Set();
+      this._containerEl = null;
+      this._wrapperEl = null;
     }
 
     get version() {
@@ -140,13 +142,13 @@
     }
 
     _render() {
-      this.container.innerHTML = '';
+      this._clearContainer();
       
-      const containerEl = document.createElement('div');
-      containerEl.className = this.options.containerClass;
+      this._containerEl = document.createElement('div');
+      this._containerEl.className = this.options.containerClass;
 
-      const wrapperEl = document.createElement('div');
-      wrapperEl.className = this.options.wrapperClass;
+      this._wrapperEl = document.createElement('div');
+      this._wrapperEl.className = this.options.wrapperClass;
 
       const itemStyles = this._getItemSizeStyles();
 
@@ -169,11 +171,19 @@
         }
 
         this.playerElements[index] = itemEl;
-        wrapperEl.appendChild(itemEl);
+        this._wrapperEl.appendChild(itemEl);
       });
 
-      containerEl.appendChild(wrapperEl);
-      this.container.appendChild(containerEl);
+      this._containerEl.appendChild(this._wrapperEl);
+      this.container.appendChild(this._containerEl);
+    }
+
+    _clearContainer() {
+      if (this._containerEl && this._containerEl.parentNode) {
+        this._containerEl.parentNode.removeChild(this._containerEl);
+      }
+      this._containerEl = null;
+      this._wrapperEl = null;
     }
 
     _createSkeleton(index) {
@@ -463,7 +473,7 @@
       return this.players[index] || null;
     }
 
-    getPlayers() {
+getPlayers() {
       return this.players.filter(p => p);
     }
 
@@ -477,7 +487,7 @@
       this.playerStates = [];
       this.playerElements = [];
       this.loadedVideos.clear();
-      this.container.innerHTML = '';
+      this._clearContainer();
       return this;
     }
   }
