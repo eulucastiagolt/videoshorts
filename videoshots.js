@@ -68,7 +68,9 @@ onReady: null,
     onStateChange: null,
     onEnd: null,
     onPlay: null,
-    onError: null
+    onError: null,
+    preloadVideoDelay: 100,
+    onPreloadVideoReady: null
   };
 
   let ytApiReady = false;
@@ -124,10 +126,11 @@ onReady: null,
       this.overlayElements = [];
       this.playButtons = [];
       this.muteButtons = [];
-      this.observer = null;
+this.observer = null;
       this.loadedVideos = new Set();
       this._wrapperEl = null;
       this._cueVideoState = {};
+      this._preloadVideoState = {};
       this.thumbnailElements = [];
       this.thumbnailLoaded = new Set();
     }
@@ -570,21 +573,18 @@ onReady: null,
       return this.loadedVideos.has(index);
     }
 
-    cueVideo(index, seconds = 0, muted = true) {
+    preloadVideo(index, seconds = 0, muted = true, delay) {
       if (index === undefined) return this;
       
-      this._cueVideoState[index] = true;
+      const preloadDelay = delay !== undefined ? delay : this.options.preloadVideoDelay;
+      this._preloadVideoState[index] = true;
       
       if (this.options.showThumbnail) {
         this._showThumbnail(index);
       }
       
-      const cueAtTime = () => {
+      const preload = () => {
         if (!this.players[index]) return;
-        if (typeof this.players[index].loadVideoById !== 'function') return;
-        
-        const videoId = extractVideoId(this.videos[index]);
-        if (!videoId) return;
         
         const player = this.players[index];
         
@@ -606,41 +606,49 @@ onReady: null,
         this._updateMuteButton(index);
         
         const onStateChange = (event) => {
-          if (event.data === YT.PlayerState.PLAYING && this._cueVideoState[index]) {
-            this._cueVideoState[index] = false;
-            if (this.players[index] && typeof this.players[index].seekTo === 'function') {
-              this.players[index].seekTo(seconds, true);
-            }
+          if (event.data === YT.PlayerState.PLAYING && this._preloadVideoState[index]) {
+            this._preloadVideoState[index] = false;
+            
             if (this.players[index] && typeof this.players[index].pauseVideo === 'function') {
               this.players[index].pauseVideo();
             }
-            if (this.playerStates[index]) {
-              this.playerStates[index].playing = false;
-            }
-            this._updatePlayButton(index);
             
-            if (this.options.showThumbnail) {
-              this._showThumbnail(index);
-            }
-            
-            player.removeEventListener('onStateChange', onStateChange);
+            setTimeout(() => {
+              if (this.players[index] && typeof this.players[index].seekTo === 'function') {
+                this.players[index].seekTo(seconds, true);
+              }
+              
+              if (this.playerStates[index]) {
+                this.playerStates[index].playing = false;
+              }
+              this._updatePlayButton(index);
+              
+              if (this.options.showThumbnail) {
+                this._showThumbnail(index);
+              }
+              
+              if (this.options.onPreloadVideoReady) {
+                this.options.onPreloadVideoReady(index, seconds, this);
+              }
+              
+              player.removeEventListener('onStateChange', onStateChange);
+            }, preloadDelay);
           }
         };
         
         player.addEventListener('onStateChange', onStateChange);
         
-        player.loadVideoById({
-          videoId: videoId,
-          startSeconds: seconds
-        });
+        if (typeof player.playVideo === 'function') {
+          player.playVideo();
+        }
       };
 
       if (!this.loadedVideos.has(index)) {
         this._loadVideo(index).then(() => {
-          setTimeout(cueAtTime, 150);
+          setTimeout(preload, 150);
         });
       } else {
-        cueAtTime();
+        preload();
       }
       
       return this;
@@ -846,6 +854,7 @@ getPlayers() {
       this.muteButtons = [];
       this.thumbnailElements = [];
       this.thumbnailLoaded.clear();
+      this._preloadVideoState = {};
       this.loadedVideos.clear();
       this._clearContainer();
       return this;

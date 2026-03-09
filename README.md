@@ -125,6 +125,7 @@ const player = new VideoShorts(container, videos, {
 | `thumbnailTransitionDuration` | `string` | `'0.3s'` | Duration of thumbnail fade transition |
 | `showThumbnailOnPause` | `boolean` | `false` | Show thumbnail when video is paused |
 | `thumbnailFallbackIcon` | `string` | `'<svg>...</svg>'` | SVG icon when thumbnail fails to load |
+| `preloadVideoDelay` | `number` | `100` | Delay in ms after pause before seekTo in preloadVideo |
 | `lazy` | `boolean` | `true` | Enable lazy loading |
 | `lazyThreshold` | `number` | `0.1` | Intersection threshold (0-1) |
 | `lazyRootMargin` | `string` | `'200px'` | Load videos before they enter viewport |
@@ -162,6 +163,31 @@ player.stop();
 
 // Stop specific video
 player.stop(0);
+```
+
+### Preload Video
+
+```js
+// Preload video at specific time, paused (default: 0s, muted)
+player.preloadVideo(0);
+
+// Preload video at 10 seconds, muted
+player.preloadVideo(0, 10);
+
+// Preload video at 10 seconds, with audio
+player.preloadVideo(0, 10, false);
+
+// Preload video with custom delay (500ms after pause)
+player.preloadVideo(0, 10, true, 500);
+```
+
+The `preloadVideo()` method:
+1. Shows thumbnail (hides the loading process)
+2. Plays muted to load the video
+3. Pauses the video
+4. Seeks to the specified time
+5. Fires `onPreloadVideoReady` callback
+6. Thumbnail remains visible, waiting for manual play
 ```
 
 ### Volume Control
@@ -271,6 +297,10 @@ const player = new VideoShorts('#container', videos, {
 
   onPlay: (event, index, instance) => {
     console.log(`Video ${index} started playing`);
+  },
+
+  onPreloadVideoReady: (index, seconds, instance) => {
+    console.log(`Video ${index} preloaded at ${seconds}s`);
   },
 
   onEnd: (event, index, instance) => {
