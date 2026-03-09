@@ -238,6 +238,7 @@ this.observer = null;
     _createOverlay(index) {
       const overlay = document.createElement('div');
       overlay.className = this.options.overlayClass;
+      overlay.classList.add('videoshort-overlay-hidden');
 
       const playButton = document.createElement('button');
       playButton.className = this.options.playButtonClass;
@@ -521,6 +522,11 @@ this.observer = null;
               const playerEl = document.getElementById(`videoshort-player-${this._instanceId}-${index}`);
               if (playerEl) {
                 playerEl.style.display = '';
+              }
+              
+              const overlay = this.overlayElements[index];
+              if (overlay) {
+                overlay.classList.remove('videoshort-overlay-hidden');
               }
               
               this._updatePlayButton(index);
