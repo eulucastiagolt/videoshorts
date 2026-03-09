@@ -2,13 +2,17 @@ const fs = require('fs');
 const path = require('path');
 
 function minifyJS(code) {
-  return code
-    .replace(/\/\*\![\s\S]*?\*\//g, (match) => {
-      return match
-        .replace(/\s+/g, ' ')
-        .replace(/\n/g, '\n')
-        .trim();
-    })
+  const preservedComments = [];
+  let index = 0;
+  
+  const codeWithPlaceholders = code.replace(/\/\*\![\s\S]*?\*\//g, (match) => {
+    const placeholder = `__PRESERVED_COMMENT_${index}__`;
+    preservedComments.push(match.replace(/\s+/g, ' ').trim());
+    index++;
+    return placeholder;
+  });
+  
+  return codeWithPlaceholders
     .replace(/\/\/.*$/gm, '')
     .replace(/\s+/g, ' ')
     .replace(/\s*([{}();,:<>=\+\-\*\/\!\?&|\[\]])\s*/g, '$1')
@@ -17,6 +21,7 @@ function minifyJS(code) {
     .replace(/\s+\}/g, '}')
     .replace(/\(\s+/g, '(')
     .replace(/\s+\)/g, ')')
+    .replace(/__PRESERVED_COMMENT_(\d+)__/g, (match, idx) => preservedComments[parseInt(idx)])
     .trim();
 }
 
