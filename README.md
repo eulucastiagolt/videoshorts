@@ -246,6 +246,10 @@ const player = new VideoShorts('#container', videos, {
     console.log(`Video ${index} state:`, event.data);
   },
 
+  onEnd: (event, index, instance) => {
+    console.log(`Video ${index} ended`);
+  },
+
   onError: (event, index, instance) => {
     console.error(`Video ${index} error:`, event.data);
   }

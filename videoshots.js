@@ -24,7 +24,7 @@
  * SOFTWARE.
  * 
  * @author Lucas Tiago
- * @version 1.3.0
+ * @version 1.4.0
  * @license MIT
  * @repository https://github.com/eulucastiagolt/videoshorts
  */
@@ -32,7 +32,7 @@
 (function(global) {
   'use strict';
 
-  const VERSION = '1.3.0';
+const VERSION = '1.4.0';
   const DEFAULT_OPTIONS = {
     containerClass: 'videoshort-container',
     wrapperClass: 'videoshort-wrapper',
@@ -51,7 +51,11 @@
     rel: 0,
     modestbranding: 1,
     insertPositionWrapper: 'beforeend',
-    insertPositionItem: 'beforeend'
+    insertPositionItem: 'beforeend',
+    onReady: null,
+    onStateChange: null,
+    onEnd: null,
+    onError: null
   };
 
   let ytApiReady = false;
@@ -302,6 +306,10 @@
               
               if (this.options.onStateChange) {
                 this.options.onStateChange(event, index, this);
+              }
+              
+              if (event.data === YT.PlayerState.ENDED && this.options.onEnd) {
+                this.options.onEnd(event, index, this);
               }
             },
             onError: (event) => {
