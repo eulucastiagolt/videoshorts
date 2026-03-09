@@ -120,6 +120,11 @@ const player = new VideoShorts(container, videos, {
 | `pauseButtonIcon` | `string` | `'<svg>...</svg>'` | SVG icon for pause button |
 | `muteButtonIcon` | `string` | `'<svg>...</svg>'` | SVG icon for muted state |
 | `unmuteButtonIcon` | `string` | `'<svg>...</svg>'` | SVG icon for unmuted state |
+| `showThumbnail` | `boolean` | `true` | Show video thumbnail over player |
+| `thumbnailClass` | `string` | `'videoshort-thumbnail'` | CSS class for thumbnail element |
+| `thumbnailTransitionDuration` | `string` | `'0.3s'` | Duration of thumbnail fade transition |
+| `showThumbnailOnPause` | `boolean` | `false` | Show thumbnail when video is paused |
+| `thumbnailFallbackIcon` | `string` | `'<svg>...</svg>'` | SVG icon when thumbnail fails to load |
 | `lazy` | `boolean` | `true` | Enable lazy loading |
 | `lazyThreshold` | `number` | `0.1` | Intersection threshold (0-1) |
 | `lazyRootMargin` | `string` | `'200px'` | Load videos before they enter viewport |

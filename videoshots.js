@@ -45,6 +45,11 @@ const VERSION = '1.5.0';
     muteButtonClass: 'videoshort-mute-button',
     muteButtonIcon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>',
     unmuteButtonIcon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>',
+    showThumbnail: true,
+    thumbnailClass: 'videoshort-thumbnail',
+    thumbnailTransitionDuration: '0.3s',
+    showThumbnailOnPause: false,
+    thumbnailFallbackIcon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
     lazy: true,
     lazyThreshold: 0.1,
     lazyRootMargin: '200px',
@@ -123,6 +128,8 @@ onReady: null,
       this.loadedVideos = new Set();
       this._wrapperEl = null;
       this._cueVideoState = {};
+      this.thumbnailElements = [];
+      this.thumbnailLoaded = new Set();
     }
 
     get version() {
@@ -191,6 +198,13 @@ onReady: null,
           itemEl.appendChild(playerEl);
         }
 
+        if (this.options.showThumbnail) {
+          const thumbnail = this._createThumbnail(index);
+          if (thumbnail) {
+            itemEl.appendChild(thumbnail);
+          }
+        }
+
         const overlay = this._createOverlay(index);
         itemEl.appendChild(overlay);
 
@@ -244,6 +258,74 @@ onReady: null,
       this._setupOverlayEvents(index, overlay, playButton, muteButton);
 
       return overlay;
+    }
+
+    _createThumbnail(index) {
+      if (!this.options.showThumbnail) return null;
+      
+      const videoId = extractVideoId(this.videos[index]);
+      if (!videoId) return null;
+      
+      const thumbnail = document.createElement('div');
+      thumbnail.className = this.options.thumbnailClass;
+      thumbnail.setAttribute('data-thumbnail-index', index);
+      thumbnail.style.setProperty('--videoshort-thumbnail-transition', this.options.thumbnailTransitionDuration);
+      
+      thumbnail.innerHTML = this.options.thumbnailFallbackIcon;
+      thumbnail.style.display = 'flex';
+      thumbnail.style.alignItems = 'center';
+      thumbnail.style.justifyContent = 'center';
+      thumbnail.style.backgroundColor = '#1a1a1a';
+      thumbnail.style.color = '#555';
+      
+      this._loadThumbnailImage(index, thumbnail, videoId);
+      
+      this.thumbnailElements[index] = thumbnail;
+      return thumbnail;
+    }
+
+    _loadThumbnailImage(index, thumbnail, videoId) {
+      const maxresUrl = `https://i.ytimg.com/vi_webp/${videoId}/maxresdefault.webp`;
+      const hqUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+      
+      const testImage = new Image();
+      
+      testImage.onload = () => {
+        thumbnail.style.backgroundImage = `url(${maxresUrl})`;
+        thumbnail.innerHTML = '';
+        thumbnail.style.backgroundColor = '';
+        this.thumbnailLoaded.add(index);
+      };
+      
+      testImage.onerror = () => {
+        const fallbackImage = new Image();
+        fallbackImage.onload = () => {
+          thumbnail.style.backgroundImage = `url(${hqUrl})`;
+          thumbnail.innerHTML = '';
+          thumbnail.style.backgroundColor = '';
+          this.thumbnailLoaded.add(index);
+        };
+        fallbackImage.onerror = () => {
+          console.warn(`Thumbnail not found for video ${videoId}`);
+        };
+        fallbackImage.src = hqUrl;
+      };
+      
+      testImage.src = maxresUrl;
+    }
+
+    _showThumbnail(index) {
+      const thumbnail = this.thumbnailElements[index];
+      if (thumbnail) {
+        thumbnail.classList.remove('videoshort-thumbnail-hidden');
+      }
+    }
+
+    _hideThumbnail(index) {
+      const thumbnail = this.thumbnailElements[index];
+      if (thumbnail) {
+        thumbnail.classList.add('videoshort-thumbnail-hidden');
+      }
     }
 
     _setupOverlayEvents(index, overlay, playButton, muteButton) {
@@ -418,6 +500,10 @@ onReady: null,
               this._updatePlayButton(index);
               this._updateMuteButton(index);
               
+              if (this.options.showThumbnail) {
+                this._showThumbnail(index);
+              }
+              
               if (this.options.onReady) {
                 this.options.onReady(event, index, this);
               }
@@ -429,6 +515,16 @@ onReady: null,
               this.playerStates[index].playing = event.data === YT.PlayerState.PLAYING;
               
               this._updatePlayButton(index);
+              
+              if (this.options.showThumbnail) {
+                if (event.data === YT.PlayerState.PLAYING) {
+                  this._hideThumbnail(index);
+                } else if (event.data === YT.PlayerState.PAUSED && this.options.showThumbnailOnPause) {
+                  this._showThumbnail(index);
+                } else if (event.data === YT.PlayerState.ENDED) {
+                  this._showThumbnail(index);
+                }
+              }
               
               if (this.options.onStateChange) {
                 this.options.onStateChange(event, index, this);
@@ -471,6 +567,10 @@ onReady: null,
       
       this._cueVideoState[index] = true;
       
+      if (this.options.showThumbnail) {
+        this._showThumbnail(index);
+      }
+      
       const cueAtTime = () => {
         if (!this.players[index]) return;
         if (typeof this.players[index].loadVideoById !== 'function') return;
@@ -510,6 +610,11 @@ onReady: null,
               this.playerStates[index].playing = false;
             }
             this._updatePlayButton(index);
+            
+            if (this.options.showThumbnail) {
+              this._showThumbnail(index);
+            }
+            
             player.removeEventListener('onStateChange', onStateChange);
           }
         };
@@ -549,6 +654,9 @@ onReady: null,
     play(index) {
       if (index !== undefined) {
         this._cueVideoState[index] = false;
+        if (this.options.showThumbnail) {
+          this._hideThumbnail(index);
+        }
         if (this.players[index]) {
           this.players[index].playVideo();
         } else if (!this.loadedVideos.has(index)) {
@@ -559,6 +667,9 @@ onReady: null,
       } else {
         this.players.forEach((player, i) => {
           this._cueVideoState[i] = false;
+          if (this.options.showThumbnail) {
+            this._hideThumbnail(i);
+          }
           if (player) player.playVideo();
         });
       }
@@ -568,8 +679,16 @@ onReady: null,
     pause(index) {
       if (index !== undefined && this.players[index]) {
         this.players[index].pauseVideo();
+        if (this.options.showThumbnail && this.options.showThumbnailOnPause) {
+          this._showThumbnail(index);
+        }
       } else {
-        this.players.forEach(player => player && player.pauseVideo());
+        this.players.forEach((player, i) => {
+          if (player) player.pauseVideo();
+          if (this.options.showThumbnail && this.options.showThumbnailOnPause) {
+            this._showThumbnail(i);
+          }
+        });
       }
       return this;
     }
@@ -577,8 +696,16 @@ onReady: null,
     stop(index) {
       if (index !== undefined && this.players[index]) {
         this.players[index].stopVideo();
+        if (this.options.showThumbnail) {
+          this._showThumbnail(index);
+        }
       } else {
-        this.players.forEach(player => player && player.stopVideo());
+        this.players.forEach((player, i) => {
+          if (player) player.stopVideo();
+          if (this.options.showThumbnail) {
+            this._showThumbnail(i);
+          }
+        });
       }
       return this;
     }
@@ -709,6 +836,8 @@ getPlayers() {
       this.overlayElements = [];
       this.playButtons = [];
       this.muteButtons = [];
+      this.thumbnailElements = [];
+      this.thumbnailLoaded.clear();
       this.loadedVideos.clear();
       this._clearContainer();
       return this;
