@@ -314,10 +314,14 @@ onReady: null,
       testImage.src = maxresUrl;
     }
 
-    _showThumbnail(index) {
+_showThumbnail(index) {
       const thumbnail = this.thumbnailElements[index];
       if (thumbnail) {
         thumbnail.classList.remove('videoshort-thumbnail-hidden');
+      }
+      const playButton = this.playButtons[index];
+      if (playButton) {
+        playButton.classList.add('videoshort-play-button-visible');
       }
     }
 
@@ -325,6 +329,26 @@ onReady: null,
       const thumbnail = this.thumbnailElements[index];
       if (thumbnail) {
         thumbnail.classList.add('videoshort-thumbnail-hidden');
+      }
+      const playButton = this.playButtons[index];
+      if (playButton) {
+        playButton.classList.remove('videoshort-play-button-visible');
+      }
+    }
+      const playButton = this.playButtons[index];
+      if (playButton) {
+        playButton.classList.add('videoshort-play-button-visible');
+      }
+    }
+
+    _hideThumbnail(index) {
+      const thumbnail = this.thumbnailElements[index];
+      if (thumbnail) {
+        thumbnail.classList.add('videoshort-thumbnail-hidden');
+      }
+      const playButton = this.playButtons[index];
+      if (playButton) {
+        playButton.classList.remove('videoshort-play-button-visible');
       }
     }
 

@@ -110,6 +110,14 @@
   opacity: 1;
 }
 
+.videoshort-play-button-visible {
+  opacity: 1 !important;
+}
+
+.videoshort-play-button-visible {
+  opacity: 1 !important;
+}
+
 .videoshort-play-button {
   width: 60px;
   height: 60px;
