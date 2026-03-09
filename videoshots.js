@@ -123,6 +123,7 @@ const VERSION = '1.5.0';
       this.observer = null;
       this.loadedVideos = new Set();
       this._wrapperEl = null;
+      this._cueVideoState = {};
     }
 
     get version() {
@@ -470,6 +471,7 @@ const VERSION = '1.5.0';
       if (index === undefined) return this;
       
       const pauseDelay = delay !== undefined ? delay : this.options.cueVideoDelay;
+      this._cueVideoState[index] = true;
       
       const cueAtTime = () => {
         if (!this.players[index]) return;
@@ -481,16 +483,16 @@ const VERSION = '1.5.0';
         const player = this.players[index];
         
         const onStateChange = (event) => {
-          if (event.data === YT.PlayerState.PLAYING) {
+          if (event.data === YT.PlayerState.PLAYING && this._cueVideoState[index]) {
             setTimeout(() => {
-              if (this.players[index] && typeof this.players[index].pauseVideo === 'function') {
+              if (this._cueVideoState[index] && this.players[index] && typeof this.players[index].pauseVideo === 'function') {
                 this.players[index].pauseVideo();
+                this._cueVideoState[index] = false;
               }
               if (this.playerStates[index]) {
                 this.playerStates[index].playing = false;
               }
               this._updatePlayButton(index);
-              player.removeEventListener('onStateChange', onStateChange);
             }, pauseDelay);
           }
         };
@@ -529,6 +531,7 @@ const VERSION = '1.5.0';
 
     play(index) {
       if (index !== undefined) {
+        this._cueVideoState[index] = false;
         if (this.players[index]) {
           this.players[index].playVideo();
         } else if (!this.loadedVideos.has(index)) {
@@ -537,7 +540,10 @@ const VERSION = '1.5.0';
           });
         }
       } else {
-        this.players.forEach(player => player && player.playVideo());
+        this.players.forEach((player, i) => {
+          this._cueVideoState[i] = false;
+          if (player) player.playVideo();
+        });
       }
       return this;
     }
