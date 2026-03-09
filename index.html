@@ -89,6 +89,9 @@
         wrapperClass: 'videoshort-wrapper',
         itemClass: 'videoshort-item',
         skeletonClass: 'videoshort-skeleton',
+        overlayClass: 'videoshort-overlay',
+        playButtonClass: 'videoshort-play-button',
+        muteButtonClass: 'videoshort-mute-button',
         lazy: true,
         width: '280px',
         aspectRatio: '9/16',
@@ -97,6 +100,12 @@
         controls: 1,
         onReady: (event, index, instance) => {
           console.log(`Short ${index} ready`);
+        },
+        onPlay: (event, index, instance) => {
+          console.log(`Short ${index} started playing`);
+        },
+        onEnd: (event, index, instance) => {
+          console.log(`Short ${index} ended`);
         }
       });
 
@@ -105,6 +114,9 @@
         wrapperClass: 'videoshort-wrapper',
         itemClass: 'videoshort-item',
         skeletonClass: 'videoshort-skeleton',
+        overlayClass: 'videoshort-overlay',
+        playButtonClass: 'videoshort-play-button',
+        muteButtonClass: 'videoshort-mute-button',
         lazy: true,
         width: '480px',
         aspectRatio: '16/9',
@@ -113,6 +125,12 @@
         controls: 1,
         onReady: (event, index, instance) => {
           console.log(`Video ${index} ready`);
+        },
+        onPlay: (event, index, instance) => {
+          console.log(`Video ${index} started playing`);
+        },
+        onEnd: (event, index, instance) => {
+          console.log(`Video ${index} ended`);
         }
       });
 
