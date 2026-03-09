@@ -1,11 +1,11 @@
 {
   "name": "videoshots",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A lightweight YouTube video library with lazy loading support",
   "main": "dist/videoshots.min.js",
   "style": "dist/videoshots.min.css",
   "scripts": {
-    "build": "node build.js"
+    "build": "gulp build"
   },
   "keywords": [
     "youtube",
@@ -25,5 +25,11 @@
     "dist/",
     "videoshots.js",
     "videoshots.css"
-  ]
+  ],
+  "devDependencies": {
+    "gulp": "^5.0.1",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-rename": "^2.1.0",
+    "gulp-terser": "^2.1.0"
+  }
 }
