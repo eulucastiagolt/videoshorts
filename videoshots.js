@@ -470,23 +470,30 @@ const VERSION = '1.5.0';
       
       const cueAtTime = () => {
         if (!this.players[index]) return;
+        if (typeof this.players[index].loadVideoById !== 'function') return;
+        
         const videoId = extractVideoId(this.videos[index]);
         if (!videoId) return;
         
-        this.players[index].cueVideoById({
+        this.players[index].loadVideoById({
           videoId: videoId,
           startSeconds: seconds
         });
         
-        if (this.playerStates[index]) {
-          this.playerStates[index].playing = false;
-        }
-        this._updatePlayButton(index);
+        setTimeout(() => {
+          if (this.players[index] && typeof this.players[index].pauseVideo === 'function') {
+            this.players[index].pauseVideo();
+          }
+          if (this.playerStates[index]) {
+            this.playerStates[index].playing = false;
+          }
+          this._updatePlayButton(index);
+        }, 100);
       };
 
       if (!this.loadedVideos.has(index)) {
         this._loadVideo(index).then(() => {
-          setTimeout(cueAtTime, 100);
+          setTimeout(cueAtTime, 150);
         });
       } else {
         cueAtTime();
