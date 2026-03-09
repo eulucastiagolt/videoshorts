@@ -457,9 +457,10 @@ this.observer = null;
 
       const playerEl = document.createElement('div');
       playerEl.id = `videoshort-player-${this._instanceId}-${index}`;
+      playerEl.style.display = 'none';
 
       if (skeleton) {
-        skeleton.replaceWith(playerEl);
+        skeleton.parentNode.insertBefore(playerEl, skeleton.nextSibling);
       } else {
         itemEl.appendChild(playerEl);
       }
@@ -507,6 +508,19 @@ this.observer = null;
                 muted: this.options.muted,
                 playing: false
               };
+              
+              const itemEl = this.playerElements[index];
+              if (itemEl) {
+                const skeleton = itemEl.querySelector(`.${this.options.skeletonClass}`);
+                if (skeleton) {
+                  skeleton.remove();
+                }
+              }
+              
+              const playerEl = document.getElementById(`videoshort-player-${this._instanceId}-${index}`);
+              if (playerEl) {
+                playerEl.style.display = '';
+              }
               
               this._updatePlayButton(index);
               this._updateMuteButton(index);
@@ -576,7 +590,7 @@ this.observer = null;
     preloadVideo(index, seconds = 0, muted = true, delay) {
       if (index === undefined) return this;
       
-      const preloadDelay = delay !== undefined ? delay : this.options.preloadVideoDelay;
+      const preloadDelay = Math.max(50, delay !== undefined ? delay : this.options.preloadVideoDelay);
       this._preloadVideoState[index] = true;
       
       if (this.options.showThumbnail) {
@@ -609,30 +623,32 @@ this.observer = null;
           if (event.data === YT.PlayerState.PLAYING && this._preloadVideoState[index]) {
             this._preloadVideoState[index] = false;
             
-            if (this.players[index] && typeof this.players[index].pauseVideo === 'function') {
-              this.players[index].pauseVideo();
-            }
-            
             setTimeout(() => {
-              if (this.players[index] && typeof this.players[index].seekTo === 'function') {
-                this.players[index].seekTo(seconds, true);
+              if (this.players[index] && typeof this.players[index].pauseVideo === 'function') {
+                this.players[index].pauseVideo();
               }
               
-              if (this.playerStates[index]) {
-                this.playerStates[index].playing = false;
-              }
-              this._updatePlayButton(index);
-              
-              if (this.options.showThumbnail) {
-                this._showThumbnail(index);
-              }
-              
-              if (this.options.onPreloadVideoReady) {
-                this.options.onPreloadVideoReady(index, seconds, this);
-              }
-              
-              player.removeEventListener('onStateChange', onStateChange);
-            }, preloadDelay);
+              setTimeout(() => {
+                if (this.players[index] && typeof this.players[index].seekTo === 'function') {
+                  this.players[index].seekTo(seconds, true);
+                }
+                
+                if (this.playerStates[index]) {
+                  this.playerStates[index].playing = false;
+                }
+                this._updatePlayButton(index);
+                
+                if (this.options.showThumbnail) {
+                  this._showThumbnail(index);
+                }
+                
+                if (this.options.onPreloadVideoReady) {
+                  this.options.onPreloadVideoReady(index, seconds, this);
+                }
+                
+                player.removeEventListener('onStateChange', onStateChange);
+              }, preloadDelay);
+            }, 100);
           }
         };
         
