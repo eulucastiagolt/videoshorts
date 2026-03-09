@@ -478,20 +478,29 @@ const VERSION = '1.5.0';
         const videoId = extractVideoId(this.videos[index]);
         if (!videoId) return;
         
-        this.players[index].loadVideoById({
+        const player = this.players[index];
+        
+        const onStateChange = (event) => {
+          if (event.data === YT.PlayerState.PLAYING) {
+            setTimeout(() => {
+              if (this.players[index] && typeof this.players[index].pauseVideo === 'function') {
+                this.players[index].pauseVideo();
+              }
+              if (this.playerStates[index]) {
+                this.playerStates[index].playing = false;
+              }
+              this._updatePlayButton(index);
+              player.removeEventListener('onStateChange', onStateChange);
+            }, pauseDelay);
+          }
+        };
+        
+        player.addEventListener('onStateChange', onStateChange);
+        
+        player.loadVideoById({
           videoId: videoId,
           startSeconds: seconds
         });
-        
-        setTimeout(() => {
-          if (this.players[index] && typeof this.players[index].pauseVideo === 'function') {
-            this.players[index].pauseVideo();
-          }
-          if (this.playerStates[index]) {
-            this.playerStates[index].playing = false;
-          }
-          this._updatePlayButton(index);
-        }, pauseDelay);
       };
 
       if (!this.loadedVideos.has(index)) {
