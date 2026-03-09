@@ -1,6 +1,6 @@
 {
   "name": "videoshots",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "A lightweight YouTube video library with lazy loading support",
   "main": "dist/videoshots.min.js",
   "style": "dist/videoshots.min.css",

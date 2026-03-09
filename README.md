@@ -21,8 +21,8 @@ npm install videoshots
 
 ### CDN
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.5.0/dist/videoshots.min.css">
-<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.5.0/dist/videoshots.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.6.0/dist/videoshots.min.css">
+<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.6.0/dist/videoshots.min.js"></script>
 ```
 
 ### Manual
@@ -395,6 +395,7 @@ VideoShorts is designed to work seamlessly with slider/carousel libraries like S
       const swiper = new Swiper('.swiper', {
         slidesPerView: 1,
         spaceBetween: 20,
+        loop: true, // Works with loop mode!
         pagination: {
           el: '.swiper-pagination',
         },
@@ -408,6 +409,15 @@ VideoShorts is designed to work seamlessly with slider/carousel libraries like S
 </body>
 </html>
 ```
+
+### Loop Mode Support
+
+VideoShorts is fully compatible with slider/carousel libraries that use **loop mode** (like SwiperJS's `loop: true`). When slides are cloned for infinite looping, the library automatically syncs all UI elements (play/pause buttons, mute buttons, thumbnails) across both original and cloned slides.
+
+This is achieved through:
+- `data-instance-id` attribute to isolate elements per VideoShorts instance
+- `data-video-index` attribute to identify videos across clones
+- Dynamic element queries that find all matching elements (original + clones)
 
 ### Insert Position Options
 
