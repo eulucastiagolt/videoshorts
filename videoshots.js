@@ -214,9 +214,78 @@ this.loadedVideos = new Set();
       });
 
       this.container.insertAdjacentElement(this.options.insertPositionWrapper, this._wrapperEl);
+      
+      this._setupEventDelegation();
     }
 
-    _clearContainer() {
+    _setupEventDelegation() {
+      const instanceId = this._instanceId;
+      const playButtonClass = this.options.playButtonClass;
+      const muteButtonClass = this.options.muteButtonClass;
+      const overlayClass = this.options.overlayClass;
+      
+      const getIndexFromElement = (el) => {
+        const itemEl = el.closest(`[data-video-index][data-instance-id="${instanceId}"]`);
+        return itemEl ? parseInt(itemEl.getAttribute('data-video-index'), 10) : null;
+      };
+
+      const handleWrapperClick = (e) => {
+        const target = e.target;
+        
+        const muteButton = target.closest(`.${muteButtonClass}`);
+        if (muteButton) {
+          e.stopPropagation();
+          const index = getIndexFromElement(muteButton);
+          if (index === null || isNaN(index)) return;
+          this.toggleMute(index);
+          this._updateMuteButton(index);
+          return;
+        }
+        
+        const playButton = target.closest(`.${playButtonClass}`);
+        if (playButton) {
+          e.stopPropagation();
+          const index = getIndexFromElement(playButton);
+          if (index === null || isNaN(index)) return;
+          
+          if (!this.players[index]) {
+            if (!this.loadedVideos.has(index)) {
+              this._loadVideo(index).then(() => {
+                setTimeout(() => this._togglePlayPause(index), 100);
+              });
+            }
+            return;
+          }
+          this._togglePlayPause(index);
+          return;
+        }
+        
+        const overlay = target.closest(`.${overlayClass}`);
+        if (overlay) {
+          const index = getIndexFromElement(overlay);
+          if (index === null || isNaN(index)) return;
+          
+          if (!this.players[index]) {
+            if (!this.loadedVideos.has(index)) {
+              this._loadVideo(index).then(() => {
+                setTimeout(() => this._togglePlayPause(index), 100);
+              });
+            }
+            return;
+          }
+          this._togglePlayPause(index);
+        }
+      };
+
+      this._wrapperEl.addEventListener('click', handleWrapperClick);
+      this._boundHandleWrapperClick = handleWrapperClick;
+    }
+
+_clearContainer() {
+      if (this._wrapperEl && this._boundHandleWrapperClick) {
+        this._wrapperEl.removeEventListener('click', this._boundHandleWrapperClick);
+        this._boundHandleWrapperClick = null;
+      }
       if (this._wrapperEl && this._wrapperEl.parentNode) {
         this._wrapperEl.parentNode.removeChild(this._wrapperEl);
       }
@@ -257,8 +326,6 @@ this.loadedVideos = new Set();
       this.overlayElements[index] = overlay;
       this.playButtons[index] = playButton;
       this.muteButtons[index] = muteButton;
-
-      this._setupOverlayEvents(overlay, playButton, muteButton);
 
       return overlay;
     }
@@ -353,60 +420,6 @@ _showThumbnail(index) {
       playButtons.forEach(btn => {
         btn.classList.remove('videoshort-play-button-visible');
       });
-    }
-
-    _setupOverlayEvents(overlay, playButton, muteButton) {
-      const getIndexFromElement = (el) => {
-        const itemEl = el.closest(`[data-video-index][data-instance-id="${this._instanceId}"]`);
-        return itemEl ? parseInt(itemEl.getAttribute('data-video-index'), 10) : null;
-      };
-
-      const handleOverlayClick = (e) => {
-        if (e.target === muteButton || muteButton.contains(e.target)) return;
-        if (e.target === playButton || playButton.contains(e.target)) return;
-        
-        const index = getIndexFromElement(overlay);
-        if (index === null || isNaN(index)) return;
-        
-        if (!this.players[index]) {
-          if (!this.loadedVideos.has(index)) {
-            this._loadVideo(index).then(() => {
-              setTimeout(() => this._togglePlayPause(index), 100);
-            });
-          }
-          return;
-        }
-        this._togglePlayPause(index);
-      };
-
-      const handlePlayClick = (e) => {
-        e.stopPropagation();
-        const index = getIndexFromElement(overlay);
-        if (index === null || isNaN(index)) return;
-        
-        if (!this.players[index]) {
-          if (!this.loadedVideos.has(index)) {
-            this._loadVideo(index).then(() => {
-              setTimeout(() => this._togglePlayPause(index), 100);
-            });
-          }
-          return;
-        }
-        this._togglePlayPause(index);
-      };
-
-      const handleMuteClick = (e) => {
-        e.stopPropagation();
-        const index = getIndexFromElement(overlay);
-        if (index === null || isNaN(index)) return;
-        
-        this.toggleMute(index);
-        this._updateMuteButton(index);
-      };
-
-      overlay.addEventListener('click', handleOverlayClick);
-      playButton.addEventListener('click', handlePlayClick);
-      muteButton.addEventListener('click', handleMuteClick);
     }
 
     _togglePlayPause(index) {
