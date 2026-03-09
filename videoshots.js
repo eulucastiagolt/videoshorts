@@ -237,12 +237,27 @@ const VERSION = '1.5.0';
       this.playButtons[index] = playButton;
       this.muteButtons[index] = muteButton;
 
-      this._setupOverlayEvents(index, playButton, muteButton);
+      this._setupOverlayEvents(index, overlay, playButton, muteButton);
 
       return overlay;
     }
 
-    _setupOverlayEvents(index, playButton, muteButton) {
+    _setupOverlayEvents(index, overlay, playButton, muteButton) {
+      const handleOverlayClick = (e) => {
+        if (e.target === muteButton || muteButton.contains(e.target)) return;
+        if (e.target === playButton || playButton.contains(e.target)) return;
+        
+        if (!this.players[index]) {
+          if (!this.loadedVideos.has(index)) {
+            this._loadVideo(index).then(() => {
+              setTimeout(() => this._togglePlayPause(index), 100);
+            });
+          }
+          return;
+        }
+        this._togglePlayPause(index);
+      };
+
       const handlePlayClick = (e) => {
         e.stopPropagation();
         if (!this.players[index]) {
@@ -262,6 +277,7 @@ const VERSION = '1.5.0';
         this._updateMuteButton(index);
       };
 
+      overlay.addEventListener('click', handleOverlayClick);
       playButton.addEventListener('click', handlePlayClick);
       muteButton.addEventListener('click', handleMuteClick);
     }
