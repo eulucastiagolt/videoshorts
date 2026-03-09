@@ -49,7 +49,10 @@
     loop: false,
     controls: 1,
     rel: 0,
-    modestbranding: 1
+    modestbranding: 1,
+    insertPositionContainer: 'beforeend',
+    insertPositionWrapper: 'beforeend',
+    insertPositionItem: 'beforeend'
   };
 
   let ytApiReady = false;
@@ -171,11 +174,11 @@
         }
 
         this.playerElements[index] = itemEl;
-        this._wrapperEl.appendChild(itemEl);
+        this._wrapperEl.insertAdjacentElement(this.options.insertPositionItem, itemEl);
       });
 
-      this._containerEl.appendChild(this._wrapperEl);
-      this.container.appendChild(this._containerEl);
+      this._containerEl.insertAdjacentElement(this.options.insertPositionWrapper, this._wrapperEl);
+      this.container.insertAdjacentElement(this.options.insertPositionContainer, this._containerEl);
     }
 
     _clearContainer() {
