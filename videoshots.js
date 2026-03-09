@@ -68,9 +68,7 @@ onReady: null,
     onStateChange: null,
     onEnd: null,
     onPlay: null,
-    onError: null,
-    preloadVideoDelay: 100,
-    onPreloadVideoReady: null
+    onError: null
   };
 
   let ytApiReady = false;
@@ -127,10 +125,9 @@ onReady: null,
       this.playButtons = [];
       this.muteButtons = [];
 this.observer = null;
-      this.loadedVideos = new Set();
+this.loadedVideos = new Set();
       this._wrapperEl = null;
       this._cueVideoState = {};
-      this._preloadVideoState = {};
       this.thumbnailElements = [];
       this.thumbnailLoaded = new Set();
     }
@@ -590,91 +587,8 @@ this.observer = null;
       return this;
     }
 
-    isLoaded(index) {
+isLoaded(index) {
       return this.loadedVideos.has(index);
-    }
-
-    preloadVideo(index, seconds = 0, muted = true, delay) {
-      if (index === undefined) return this;
-      
-      const preloadDelay = Math.max(50, delay !== undefined ? delay : this.options.preloadVideoDelay);
-      this._preloadVideoState[index] = true;
-      
-      if (this.options.showThumbnail) {
-        this._showThumbnail(index);
-      }
-      
-      const preload = () => {
-        if (!this.players[index]) return;
-        
-        const player = this.players[index];
-        
-        if (muted) {
-          if (typeof player.mute === 'function') {
-            player.mute();
-          }
-          if (this.playerStates[index]) {
-            this.playerStates[index].muted = true;
-          }
-        } else {
-          if (typeof player.unMute === 'function') {
-            player.unMute();
-          }
-          if (this.playerStates[index]) {
-            this.playerStates[index].muted = false;
-          }
-        }
-        this._updateMuteButton(index);
-        
-        const onStateChange = (event) => {
-          if (event.data === YT.PlayerState.PLAYING && this._preloadVideoState[index]) {
-            this._preloadVideoState[index] = false;
-            
-            setTimeout(() => {
-              if (this.players[index] && typeof this.players[index].pauseVideo === 'function') {
-                this.players[index].pauseVideo();
-              }
-              
-              setTimeout(() => {
-                if (this.players[index] && typeof this.players[index].seekTo === 'function') {
-                  this.players[index].seekTo(seconds, true);
-                }
-                
-                if (this.playerStates[index]) {
-                  this.playerStates[index].playing = false;
-                }
-                this._updatePlayButton(index);
-                
-                if (this.options.showThumbnail) {
-                  this._showThumbnail(index);
-                }
-                
-                if (this.options.onPreloadVideoReady) {
-                  this.options.onPreloadVideoReady(index, seconds, this);
-                }
-                
-                player.removeEventListener('onStateChange', onStateChange);
-              }, preloadDelay);
-            }, 100);
-          }
-        };
-        
-        player.addEventListener('onStateChange', onStateChange);
-        
-        if (typeof player.playVideo === 'function') {
-          player.playVideo();
-        }
-      };
-
-      if (!this.loadedVideos.has(index)) {
-        this._loadVideo(index).then(() => {
-          setTimeout(preload, 150);
-        });
-      } else {
-        preload();
-      }
-      
-      return this;
     }
 
     setSize(options) {
@@ -877,7 +791,6 @@ getPlayers() {
       this.muteButtons = [];
       this.thumbnailElements = [];
       this.thumbnailLoaded.clear();
-      this._preloadVideoState = {};
       this.loadedVideos.clear();
       this._clearContainer();
       return this;

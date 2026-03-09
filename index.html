@@ -60,14 +60,12 @@
     <button onclick="shorts.mute()">Mute All</button>
     <button onclick="shorts.unMute()">Unmute All</button>
     <button onclick="shorts.setVolume(50)">Volume 50%</button>
-    <button onclick="shorts.preloadVideo(0, 0)">Preload Video 0 at 0s</button>
     <hr>
     <strong>Normal Videos Controls:</strong><br>
     <button onclick="normal.play()">Play All</button>
     <button onclick="normal.pause()">Pause All</button>
     <button onclick="normal.mute()">Mute All</button>
     <button onclick="normal.unMute()">Unmute All</button>
-    <button onclick="normal.preloadVideo(0, 10, false, 500)">Preload Video 0 at 10s</button>
   </div>
 
   <script src="videoshots.js"></script>
@@ -102,7 +100,7 @@
         aspectRatio: '9/16',
         muted: true,
         loop: true,
-        controls: 1,
+        controls: 0,
         onReady: (event, index, instance) => {
           console.log(`Short ${index} ready`);
         },
@@ -127,7 +125,7 @@
         aspectRatio: '16/9',
         muted: true,
         loop: true,
-        controls: 1,
+        controls: 0,
         cueVideoDelay: 0,
         onReady: (event, index, instance) => {
           console.log(`Video ${index} ready`);
