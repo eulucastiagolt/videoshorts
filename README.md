@@ -21,8 +21,8 @@ npm install videoshots
 
 ### CDN
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.6.0/dist/videoshots.min.css">
-<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.6.0/dist/videoshots.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.6.1/dist/videoshots.min.css">
+<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.6.1/dist/videoshots.min.js"></script>
 ```
 
 ### Manual
