@@ -104,12 +104,15 @@ const VERSION = '1.5.0';
   }
 
   class VideoShorts {
+    static _instanceId = 0;
+
     constructor(container, videos, options = {}) {
       this.container = typeof container === 'string' 
         ? document.querySelector(container) 
         : container;
       this.videos = videos;
       this.options = { ...DEFAULT_OPTIONS, ...options };
+      this._instanceId = VideoShorts._instanceId++;
       this.players = [];
       this.playerStates = [];
       this.playerElements = [];
@@ -183,7 +186,7 @@ const VERSION = '1.5.0';
           itemEl.appendChild(skeleton);
         } else {
           const playerEl = document.createElement('div');
-          playerEl.id = `videoshort-player-${index}`;
+          playerEl.id = `videoshort-player-${this._instanceId}-${index}`;
           itemEl.appendChild(playerEl);
         }
 
@@ -359,7 +362,7 @@ const VERSION = '1.5.0';
       await loadYouTubeAPI();
 
       const playerEl = document.createElement('div');
-      playerEl.id = `videoshort-player-${index}`;
+      playerEl.id = `videoshort-player-${this._instanceId}-${index}`;
 
       if (skeleton) {
         skeleton.replaceWith(playerEl);
@@ -386,13 +389,13 @@ const VERSION = '1.5.0';
 
     _createPlayer(index, videoId) {
       return new Promise((resolve) => {
-        const playerEl = document.getElementById(`videoshort-player-${index}`);
+        const playerEl = document.getElementById(`videoshort-player-${this._instanceId}-${index}`);
         if (!playerEl) {
           resolve();
           return;
         }
 
-        const player = new YT.Player(`videoshort-player-${index}`, {
+        const player = new YT.Player(`videoshort-player-${this._instanceId}-${index}`, {
           videoId: videoId,
           playerVars: {
             autoplay: this.options.autoplay ? 1 : 0,
