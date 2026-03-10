@@ -2,7 +2,7 @@
  * VideoShorts
  * A lightweight YouTube video library with lazy loading support
  *
- * Copyright (c) 2025 Lucas Tiago
+ * Copyright (c) 2026 Lucas Tiago
  * Licensed under the MIT License
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
