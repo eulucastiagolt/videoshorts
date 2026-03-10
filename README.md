@@ -16,19 +16,19 @@ A lightweight YouTube video library with lazy loading support. Transform YouTube
 
 ### NPM
 ```bash
-npm install videoshots
+npm install videoshorts
 ```
 
 ### CDN
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.6.5/dist/videoshots.min.css">
-<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.6.5/dist/videoshots.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.6.6/dist/videoshorts.min.css">
+<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.6.6/dist/videoshorts.min.js"></script>
 ```
 
 ### Manual
 Download the files from `dist/` folder:
-- `videoshots.min.js`
-- `videoshots.min.css`
+- `videoshorts.min.js`
+- `videoshorts.min.css`
 
 ## Quick Start
 
@@ -36,12 +36,12 @@ Download the files from `dist/` folder:
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="videoshots.min.css">
+  <link rel="stylesheet" href="videoshorts.min.css">
 </head>
 <body>
   <div id="videos" data-videoshort></div>
 
-  <script src="videoshots.min.js"></script>
+  <script src="videoshorts.min.js"></script>
   <script>
     const videos = [
       'https://www.youtube.com/shorts/ZDqo7XROuwM',
@@ -365,7 +365,7 @@ VideoShorts is designed to work seamlessly with slider/carousel libraries like S
   <!-- Swiper CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
   <!-- VideoShorts CSS -->
-  <link rel="stylesheet" href="videoshots.min.css">
+  <link rel="stylesheet" href="videoshorts.min.css">
 </head>
 <body>
   <div class="swiper">
@@ -376,7 +376,7 @@ VideoShorts is designed to work seamlessly with slider/carousel libraries like S
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  <script src="videoshots.min.js"></script>
+  <script src="videoshorts.min.js"></script>
   <script>
     const videos = [
       'https://www.youtube.com/shorts/ZDqo7XROuwM',
@@ -439,8 +439,8 @@ npm run build
 ```
 
 Output files in `dist/`:
-- `videoshots.min.js`
-- `videoshots.min.css`
+- `videoshorts.min.js`
+- `videoshorts.min.css`
 
 ## Browser Support
 
