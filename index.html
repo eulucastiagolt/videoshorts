@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VideoShorts Example - v1.6.3</title>
+  <title>VideoShorts Example - v1.6.4</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
   <link rel="stylesheet" href="videoshots.css">
   <style>
@@ -62,9 +62,25 @@
 <body>
   <h2>Shorts (9/16)</h2>
   <div id="video-container-shorts" data-videoshort></div>
+  <div id="controls">
+    <strong>Shorts Controls:</strong><br>
+    <button onclick="shorts.play()">Play All</button>
+    <button onclick="shorts.pause()">Pause All</button>
+    <button onclick="shorts.stop()">Stop All</button>
+    <button onclick="shorts.mute()">Mute All</button>
+    <button onclick="shorts.unMute()">Unmute All</button>
+    <button onclick="shorts.setVolume(50)">Volume 50%</button>
+  </div>
 
   <h2> Videos (16/9)</h2>
   <div id="video-container-normal" data-videoshort></div>
+  <div id="controls">
+    <strong>Normal Videos Controls:</strong><br>
+    <button onclick="normal.play()">Play All</button>
+    <button onclick="normal.pause()">Pause All</button>
+    <button onclick="normal.mute()">Mute All</button>
+    <button onclick="normal.unMute()">Unmute All</button>
+  </div>
 
   <h2>Swiperjs</h2>
   <div id="videoshorts" class="videoshort-container">
@@ -74,28 +90,12 @@
   </div>
   <div id="controls">
     <strong>Shorts Controls:</strong><br>
-    <button onclick="shortsSwiper.play()">Play All</button>
-    <button onclick="shortsSwiper.pause()">Pause All</button>
-    <button onclick="shortsSwiper.stop()">Stop All</button>
-    <button onclick="shortsSwiper.mute()">Mute All</button>
-    <button onclick="shortsSwiper.unMute()">Unmute All</button>
-    <button onclick="shortsSwiper.setVolume(50)">Volume 50%</button>
-  </div>
-
-  <div id="controls">
-    <strong>Shorts Controls:</strong><br>
-    <button onclick="shorts.play()">Play All</button>
-    <button onclick="shorts.pause()">Pause All</button>
-    <button onclick="shorts.stop()">Stop All</button>
-    <button onclick="shorts.mute()">Mute All</button>
-    <button onclick="shorts.unMute()">Unmute All</button>
-    <button onclick="shorts.setVolume(50)">Volume 50%</button>
-    <hr>
-    <strong>Normal Videos Controls:</strong><br>
-    <button onclick="normal.play()">Play All</button>
-    <button onclick="normal.pause()">Pause All</button>
-    <button onclick="normal.mute()">Mute All</button>
-    <button onclick="normal.unMute()">Unmute All</button>
+    <button onclick="swiperShots.play()">Play All</button>
+    <button onclick="swiperShots.pause()">Pause All</button>
+    <button onclick="swiperShots.stop()">Stop All</button>
+    <button onclick="swiperShots.mute()">Mute All</button>
+    <button onclick="swiperShots.unMute()">Unmute All</button>
+    <button onclick="swiperShots.setVolume(50)">Volume 50%</button>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
