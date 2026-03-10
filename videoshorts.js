@@ -24,7 +24,7 @@
  * SOFTWARE.
  *
  * @author Lucas Tiago
- * @version 1.6.7
+ * @version 1.6.8
  * @license MIT
  * @repository https://github.com/eulucastiagolt/videoshorts
  */
@@ -32,7 +32,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "1.6.7";
+  const VERSION = "1.6.8";
   const DEFAULT_OPTIONS = {
     containerClass: "videoshort-container",
     wrapperClass: "videoshort-wrapper",
@@ -314,7 +314,9 @@
         this._wrapperEl.parentNode.removeChild(this._wrapperEl);
       }
       if (this.options.containerClass) {
-        this.container.classList.remove(this.options.containerClass);
+        this.options.containerClass.split(/\s+/).forEach(cls => {
+          if (cls) this.container.classList.remove(cls);
+        });
       }
       this._wrapperEl = null;
     }

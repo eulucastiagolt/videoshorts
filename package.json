@@ -1,6 +1,6 @@
 {
   "name": "videoshorts",
-  "version": "1.6.7",
+  "version": "1.6.8",
   "description": "A lightweight YouTube video library with lazy loading support",
   "main": "dist/videoshorts.min.js",
   "style": "dist/videoshorts.min.css",
