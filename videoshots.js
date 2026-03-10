@@ -24,7 +24,7 @@
  * SOFTWARE.
  *
  * @author Lucas Tiago
- * @version 1.6.4
+ * @version 1.6.5
  * @license MIT
  * @repository https://github.com/eulucastiagolt/videoshorts
  */
@@ -32,7 +32,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "1.6.4";
+  const VERSION = "1.6.5";
   const DEFAULT_OPTIONS = {
     containerClass: "videoshort-container",
     wrapperClass: "videoshort-wrapper",
