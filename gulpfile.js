@@ -5,7 +5,7 @@ const rename = require('gulp-rename');
 
 function minifyJS() {
   return gulp
-    .src('videoshots.js')
+    .src('videoshorts.js')
     .pipe(terser({
       format: {
         comments: /^!/
@@ -17,7 +17,7 @@ function minifyJS() {
 
 function minifyCSS() {
   return gulp
-    .src('videoshots.css')
+    .src('videoshorts.css')
     .pipe(cleanCSS())
     .pipe(rename({ suffix: '.min' }))
     .pipe(gulp.dest('dist'));
