@@ -21,8 +21,8 @@ npm install videoshorts
 
 ### CDN
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.6.7/dist/videoshorts.min.css">
-<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.6.7/dist/videoshorts.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.7.0/dist/videoshorts.min.css">
+<script src="https://cdn.jsdelivr.net/gh/eulucastiagolt/videoshorts@1.7.0/dist/videoshorts.min.js"></script>
 ```
 
 ### Manual
@@ -243,6 +243,31 @@ const allPlayers = player.getPlayers();
 player.loadVideo(0);
 ```
 
+### Event Management
+
+```js
+// Add event listener
+player.on('play', (event, index, instance) => {
+  console.log(`Video ${index} playing`);
+});
+
+// Remove specific listener
+player.off('play', callback);
+
+// Remove all listeners for an event
+player.off('play');
+
+// Remove all listeners
+player.off();
+```
+
+### DOM Synchronization
+
+```js
+// Refresh players to sync with DOM changes (useful for sliders with loop)
+player.refresh();
+```
+
 ### Cleanup
 
 ```js
@@ -281,6 +306,117 @@ const player = new VideoShorts('#container', videos, {
     console.error(`Video ${index} error:`, event.data);
   }
 });
+```
+
+## Event System
+
+VideoShorts provides a flexible event system that allows you to add, remove, and emit events dynamically. This is useful when you need multiple listeners for the same event or want to manage events programmatically.
+
+### Adding Events
+
+```js
+const player = new VideoShorts('#container', videos, options);
+
+// Add event listeners
+player.on('ready', (event, index, instance) => {
+  console.log(`Video ${index} is ready`);
+});
+
+player.on('play', (event, index, instance) => {
+  console.log(`Video ${index} started playing`);
+});
+
+player.on('pause', (event, index, instance) => {
+  console.log(`Video ${index} paused`);
+});
+
+player.on('end', (event, index, instance) => {
+  console.log(`Video ${index} ended`);
+});
+
+player.on('stateChange', (event, index, instance) => {
+  console.log(`Video ${index} state:`, event.data);
+});
+
+player.on('error', (event, index, instance) => {
+  console.error(`Video ${index} error:`, event.data);
+});
+
+player.on('load', (index, instance) => {
+  console.log(`Video ${index} started loading`);
+});
+
+player.init();
+```
+
+### Removing Events
+
+```js
+// Define a callback
+const onPlay = (event, index, instance) => {
+  console.log(`Video ${index} playing`);
+};
+
+// Add listener
+player.on('play', onPlay);
+
+// Remove specific listener
+player.off('play', onPlay);
+
+// Remove all listeners for 'play' event
+player.off('play');
+
+// Remove all listeners for all events
+player.off();
+```
+
+### Available Events
+
+| Event | Arguments | Description |
+|-------|-----------|-------------|
+| `ready` | `(event, index, instance)` | Player is ready |
+| `play` | `(event, index, instance)` | Video started playing |
+| `pause` | `(event, index, instance)` | Video paused |
+| `end` | `(event, index, instance)` | Video ended |
+| `stateChange` | `(event, index, instance)` | Player state changed |
+| `error` | `(event, index, instance)` | Error occurred |
+| `load` | `(index, instance)` | Video started loading (lazy) |
+
+### Using with Slider Libraries (Loop Mode)
+
+When using slider libraries with loop mode (like SwiperJS), the DOM elements get cloned. The `refresh()` method helps synchronize players with the updated DOM:
+
+```js
+const player = new VideoShorts('#video-container', videos, options);
+
+player.init().then(() => {
+  const swiper = new Swiper('.swiper', {
+    loop: true,
+    // ...other options
+  });
+
+  // Refresh players when slides change
+  swiper.on('slideChange', () => player.refresh());
+  
+  // Optional: refresh on loop fix
+  swiper.on('loopFix', () => player.refresh());
+});
+```
+
+#### Integration Examples
+
+```js
+// SwiperJS
+swiper.on('slideChange', () => player.refresh());
+
+// Splide
+splide.on('moved', () => player.refresh());
+
+// Keen Slider
+slider.on('slideChanged', () => player.refresh());
+
+// Any custom slider
+mySlider.onChange(() => player.refresh());
 ```
 
 ## Supported URL Formats

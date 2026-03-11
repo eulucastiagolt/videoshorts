@@ -24,7 +24,7 @@
  * SOFTWARE.
  *
  * @author Lucas Tiago
- * @version 1.6.9
+ * @version 1.7.0
  * @license MIT
  * @repository https://github.com/eulucastiagolt/videoshorts
  */
@@ -32,7 +32,7 @@
 (function (global) {
   "use strict";
 
-  const VERSION = "1.6.9";
+  const VERSION = "1.7.0";
   const DEFAULT_OPTIONS = {
     containerClass: "videoshort-container",
     wrapperClass: "videoshort-wrapper",
@@ -137,6 +137,7 @@
       this._cueVideoState = {};
       this.thumbnailElements = [];
       this.thumbnailLoaded = new Set();
+      this._events = {};
     }
 
     get version() {
@@ -574,6 +575,8 @@
 
       this.loadedVideos.add(index);
 
+      this.emit("load", index, this);
+
       await loadYouTubeAPI();
 
       const playerEl = document.createElement("div");
@@ -675,6 +678,7 @@
                 if (this.options.onReady) {
                   this.options.onReady(event, index, this);
                 }
+                this.emit("ready", event, index, this);
                 resolve();
               },
               onStateChange: (event) => {
@@ -698,25 +702,35 @@
                   }
                 }
 
+                this.emit("stateChange", event, index, this);
+
                 if (this.options.onStateChange) {
                   this.options.onStateChange(event, index, this);
                 }
 
-                if (
-                  event.data === YT.PlayerState.PLAYING &&
-                  this.options.onPlay
-                ) {
-                  this.options.onPlay(event, index, this);
+                if (event.data === YT.PlayerState.PLAYING) {
+                  this.emit("play", event, index, this);
+                  if (this.options.onPlay) {
+                    this.options.onPlay(event, index, this);
+                  }
                 }
 
-                if (event.data === YT.PlayerState.ENDED && this.options.onEnd) {
-                  this.options.onEnd(event, index, this);
+                if (event.data === YT.PlayerState.PAUSED) {
+                  this.emit("pause", event, index, this);
+                }
+
+                if (event.data === YT.PlayerState.ENDED) {
+                  this.emit("end", event, index, this);
+                  if (this.options.onEnd) {
+                    this.options.onEnd(event, index, this);
+                  }
                 }
               },
               onError: (event) => {
                 if (this.options.onError) {
                   this.options.onError(event, index, this);
                 }
+                this.emit("error", event, index, this);
                 resolve();
               },
             },
@@ -955,7 +969,85 @@
       this.thumbnailElements = [];
       this.thumbnailLoaded.clear();
       this.loadedVideos.clear();
+      this._events = {};
       this._clearContainer();
+      return this;
+    }
+
+    on(event, callback) {
+      if (typeof callback !== "function") return this;
+      if (!this._events[event]) {
+        this._events[event] = [];
+      }
+      this._events[event].push(callback);
+      return this;
+    }
+
+    off(event, callback) {
+      if (!event) {
+        this._events = {};
+        return this;
+      }
+      if (!this._events[event]) return this;
+      if (!callback) {
+        this._events[event] = [];
+        return this;
+      }
+      this._events[event] = this._events[event].filter((cb) => cb !== callback);
+      return this;
+    }
+
+    emit(event, ...args) {
+      if (!this._events[event]) return this;
+      this._events[event].forEach((callback) => {
+        try {
+          callback(...args);
+        } catch (e) {
+          console.error(`VideoShorts: Error in event handler for "${event}"`, e);
+        }
+      });
+      return this;
+    }
+
+    refresh() {
+      const containerEl =
+        typeof this.container === "string"
+          ? document.querySelector(this.container)
+          : this.container;
+
+      if (!containerEl) return this;
+
+      const allItems = containerEl.querySelectorAll(
+        `[data-instance-id="${this._instanceId}"]`
+      );
+
+      allItems.forEach((itemEl) => {
+        const indexAttr = itemEl.getAttribute("data-video-index");
+        if (indexAttr === null) return;
+
+        const index = parseInt(indexAttr, 10);
+        if (isNaN(index)) return;
+
+        if (!this.playerElements[index]) {
+          this.playerElements[index] = itemEl;
+        }
+
+        const existingPlayer = itemEl.querySelector(
+          `#videoshort-player-${this._instanceId}-${index}`
+        );
+
+        if (existingPlayer && this.players[index]) {
+          return;
+        }
+
+        if (!this.loadedVideos.has(index)) {
+          const skeleton = itemEl.querySelector(`.${this.options.skeletonClass}`);
+          if (skeleton || !this.options.lazy) {
+            this._loadVideo(index);
+          }
+        }
+      });
+
       return this;
     }
   }
